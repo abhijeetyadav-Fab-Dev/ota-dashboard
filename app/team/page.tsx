@@ -1,0 +1,236 @@
+"use client";
+
+import { OTA_COLORS } from "@/lib/constants";
+
+/* ══════════════════════════════════════════════════════════════
+   TEAM DATA
+══════════════════════════════════════════════════════════════ */
+const OTA_SHORT: Record<string, string> = {
+  "GoMMT": "GoMMT", "Booking.com": "BDC", "Agoda": "Agoda",
+  "Expedia": "Exp", "Cleartrip": "CT", "Yatra": "Yatra",
+  "Ixigo": "Ixigo", "Akbar Travels": "AKT", "EaseMyTrip": "EMT", "Indigo": "Indigo",
+};
+
+interface Intern { name: string; otas: string[]; pip?: boolean; new?: boolean; adhoc?: boolean; role?: string; priority?: "P1" | "P2" | "P3" }
+interface TeamLead { name: string; otas: string[]; color: string; interns: Intern[] }
+
+const CURRENT_LEADS: TeamLead[] = [
+  {
+    name: "Jyoti", color: "#E83F6F", otas: ["GoMMT", "Cleartrip", "Expedia", "Indigo"],
+    interns: [
+      { name: "Rudra",    otas: ["GoMMT"],      priority: "P1" },
+      { name: "Mohit",    otas: ["Expedia"],    priority: "P1" },
+      { name: "Karan",    otas: ["Cleartrip"],  priority: "P3" },
+      { name: "Abhishek", otas: ["Indigo"],     priority: "P2" },
+      { name: "Umesh",    otas: [], role: "Ria Travels", priority: "P2" },
+      { name: "Rahul",    otas: [],             priority: "P3", pip: true },
+    ],
+  },
+  {
+    name: "Gourav", color: "#F59E0B", otas: ["Agoda", "Yatra", "Ixigo", "Akbar Travels", "EaseMyTrip"],
+    interns: [
+      { name: "Aman",     otas: ["Agoda"],          priority: "P1" },
+      { name: "Ajeet",    otas: ["Yatra"],           priority: "P1" },
+      { name: "Shrishti", otas: ["Ixigo"],           priority: "P3", pip: true },
+      { name: "Joti",     otas: ["Akbar Travels"],   priority: "P1" },
+      { name: "Vipul",    otas: ["EaseMyTrip"],      priority: "P1" },
+    ],
+  },
+  {
+    name: "Ajay", color: "#10B981", otas: ["Booking.com"],
+    interns: [
+      { name: "Gaurav Pandey", otas: ["Booking.com"], priority: "P1" },
+      { name: "Sadik",         otas: [], pip: true, role: "BDC Content", priority: "P3" },
+      { name: "Sajjak",        otas: [], role: "BDC Content",             priority: "P2" },
+    ],
+  },
+  {
+    name: "Salim", color: "#8B5CF6", otas: [],
+    interns: [
+      { name: "Karan",      otas: [], role: "FH Onboarding" },
+      { name: "Vishal",     otas: [], role: "FH Listing",              priority: "P1" },
+      { name: "Ajay Dhama", otas: [], role: "FH Images and GMB Images", priority: "P1" },
+      { name: "Yash",       otas: [], role: "OTA RLD",    priority: "P1" },
+      { name: "Gunjan",     otas: [], role: "OTA Images",  priority: "P2" },
+      { name: "Vanshika",   otas: [], role: "OTA Images",  priority: "P1" },
+    ],
+  },
+];
+
+const PROPOSED_LEADS: TeamLead[] = [
+  {
+    name: "Gourav", color: "#F59E0B",
+    otas: ["Agoda", "Yatra", "Akbar Travels", "EaseMyTrip", "Booking.com"],
+    interns: [
+      { name: "Aman",          otas: ["Agoda"],          priority: "P1" },
+      { name: "Ajeet",         otas: ["Yatra"],           priority: "P1" },
+      { name: "Joti",          otas: ["Akbar Travels"],   priority: "P1" },
+      { name: "Vipul",         otas: ["EaseMyTrip"],      priority: "P1" },
+      { name: "Gaurav Pandey", otas: ["Booking.com"],     priority: "P1" },
+      { name: "Sajjak",        otas: [], role: "BDC Content", priority: "P2" },
+    ],
+  },
+  {
+    name: "Jyoti", color: "#E83F6F",
+    otas: ["Cleartrip", "Ixigo"],
+    interns: [
+      { name: "Karan",    otas: ["Cleartrip"], priority: "P3" },
+      { name: "Shrishti", otas: ["Ixigo"],     priority: "P3", pip: true },
+      { name: "Rahul",    otas: [],            priority: "P3", pip: true },
+    ],
+  },
+  {
+    name: "Abhijeet", color: "#6366F1",
+    otas: ["GoMMT", "Expedia", "Indigo"],
+    interns: [
+      { name: "Rudra",    otas: ["GoMMT"],   priority: "P1" },
+      { name: "Mohit",    otas: ["Expedia"], priority: "P1" },
+      { name: "Abhishek", otas: ["Indigo"],  priority: "P2" },
+      { name: "Umesh",    otas: [], role: "Ria Travels", priority: "P2" },
+      { name: "Vishal",     otas: [], role: "FH Listing",              priority: "P1" },
+      { name: "Ajay Dhama", otas: [], role: "FH Images and GMB Images", priority: "P1" },
+      { name: "Yash",       otas: [], role: "OTA RLD",    priority: "P1" },
+      { name: "Gunjan",     otas: [], role: "OTA Images",  priority: "P2" },
+      { name: "Vanshika",   otas: [], role: "OTA Images",  priority: "P1" },
+    ],
+  },
+];
+
+/* ══════════════════════════════════════════════════════════════
+   MINI COMPONENTS
+══════════════════════════════════════════════════════════════ */
+function Avatar({ name, color, size = 28, fontSize = 10 }: { name: string; color: string; size?: number; fontSize?: number }) {
+  return (
+    <span style={{ width: size, height: size, borderRadius: "50%", background: color, color: "#FFF", fontSize, fontWeight: 800, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0, letterSpacing: 0 }}>
+      {name[0].toUpperCase()}
+    </span>
+  );
+}
+
+function OtaPill({ ota }: { ota: string }) {
+  const color = OTA_COLORS[ota] ?? "#64748B";
+  return (
+    <span style={{ fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 20, background: color + "18", color, border: `1px solid ${color}35` }}>
+      {OTA_SHORT[ota] ?? ota}
+    </span>
+  );
+}
+
+function Badge({ label, color, bg, border }: { label: string; color: string; bg: string; border: string }) {
+  return <span style={{ fontSize: 8, fontWeight: 700, padding: "1px 5px", borderRadius: 10, color, background: bg, border: `1px solid ${border}` }}>{label}</span>;
+}
+
+function TeamCard({ lead, isProposed = false }: { lead: TeamLead; isProposed?: boolean }) {
+  return (
+    <div style={{ background: "#FFF", borderRadius: 14, overflow: "hidden", border: isProposed ? `1.5px dashed ${lead.color}60` : "1px solid #E2E8F0", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+      {/* TL header strip */}
+      <div style={{ background: `linear-gradient(135deg, ${lead.color}18 0%, ${lead.color}08 100%)`, borderBottom: `1px solid ${lead.color}20`, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ width: 36, height: 36, borderRadius: "50%", background: isProposed && lead.name === "New TL" ? "transparent" : lead.color, color: isProposed && lead.name === "New TL" ? lead.color : "#FFF", border: isProposed && lead.name === "New TL" ? `2px dashed ${lead.color}` : "none", fontSize: 14, fontWeight: 800, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: lead.name === "New TL" ? "none" : `0 3px 8px ${lead.color}50`, flexShrink: 0 }}>
+          {lead.name[0]}
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span style={{ fontSize: 13, fontWeight: 800, color: "#0F172A" }}>{lead.name}</span>
+            <span style={{ fontSize: 8, fontWeight: 700, color: "#FFF", background: lead.color, borderRadius: 4, padding: "1px 5px", letterSpacing: "0.05em" }}>TL</span>
+            {isProposed && lead.name === "New TL" && (
+              <span style={{ fontSize: 8, fontWeight: 700, color: "#6366F1", background: "#EEF2FF", border: "1px solid #C7D2FE", borderRadius: 4, padding: "1px 5px" }}>TBD</span>
+            )}
+          </div>
+          {lead.otas.length > 0 ? (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 3, marginTop: 4 }}>
+              {lead.otas.map((ota) => <OtaPill key={ota} ota={ota} />)}
+            </div>
+          ) : (
+            <span style={{ fontSize: 10, color: "#94A3B8", fontStyle: "italic" }}>GMB / Ops</span>
+          )}
+        </div>
+        <span style={{ fontSize: 10, fontWeight: 700, color: lead.color, background: lead.color + "18", border: `1px solid ${lead.color}30`, borderRadius: 20, padding: "2px 8px", flexShrink: 0 }}>
+          {lead.interns.length}
+        </span>
+      </div>
+
+      {/* Intern list */}
+      <div style={{ padding: "8px 14px 10px" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {lead.interns.map((intern, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 8px", borderRadius: 8, background: "#F8FAFC" }}>
+              <Avatar name={intern.name} color={lead.color + "99"} size={24} fontSize={9} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 5, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: "#1E293B" }}>{intern.name}</span>
+                  {intern.priority === "P1" && <Badge label="P1" color="#16A34A" bg="#DCFCE7" border="#86EFAC" />}
+                  {intern.priority === "P2" && <Badge label="P2" color="#D97706" bg="#FEF3C7" border="#FCD34D" />}
+                  {intern.priority === "P3" && <Badge label="P3" color="#DC2626" bg="#FEE2E2" border="#FCA5A5" />}
+                  {intern.pip   && <Badge label="PIP"     color="#EF4444" bg="#FEF2F2" border="#FECACA" />}
+                  {intern.adhoc && <Badge label="Ad-Hoc"  color="#6366F1" bg="#EEF2FF" border="#C7D2FE" />}
+                  {intern.new   && <Badge label="New"     color="#10B981" bg="#D1FAE5" border="#A7F3D0" />}
+                </div>
+              </div>
+              <div style={{ flexShrink: 0 }}>
+                {intern.role ? (
+                  <span style={{ fontSize: 9, fontWeight: 600, color: "#6366F1", background: "#EEF2FF", border: "1px solid #C7D2FE", borderRadius: 6, padding: "2px 7px" }}>
+                    {intern.role}
+                  </span>
+                ) : intern.otas.length > 0 ? (
+                  <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
+                    {intern.otas.map((ota) => <OtaPill key={ota} ota={ota} />)}
+                  </div>
+                ) : (
+                  <span style={{ fontSize: 9, color: "#94A3B8" }}>All OTAs</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PAGE
+══════════════════════════════════════════════════════════════ */
+export default function TeamPage() {
+  const currentTotal  = CURRENT_LEADS.reduce((n, t) => n + t.interns.length, 0);
+  const proposedTotal = PROPOSED_LEADS.reduce((n, t) => n + t.interns.length, 0);
+
+  return (
+    <div style={{ padding: "20px 24px", background: "#F8FAFC", minHeight: "100vh" }}>
+      <div style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
+
+        {/* ── LEFT: Current Structure ─────────────────────────────── */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+            <span style={{ fontSize: 13, fontWeight: 800, color: "#0F172A" }}>Current Structure</span>
+            <span style={{ fontSize: 10, fontWeight: 700, color: "#64748B", background: "#F1F5F9", border: "1px solid #E2E8F0", borderRadius: 20, padding: "2px 9px" }}>
+              {currentTotal} members
+            </span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {CURRENT_LEADS.map((lead) => <TeamCard key={lead.name} lead={lead} />)}
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div style={{ width: 1, background: "linear-gradient(to bottom, transparent, #E2E8F0 20%, #E2E8F0 80%, transparent)", alignSelf: "stretch", flexShrink: 0 }} />
+
+        {/* ── RIGHT: Proposed Structure ───────────────────────────── */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+            <span style={{ fontSize: 13, fontWeight: 800, color: "#0F172A" }}>Proposed Structure</span>
+            <span style={{ fontSize: 10, fontWeight: 700, color: "#6366F1", background: "#EEF2FF", border: "1px solid #C7D2FE", borderRadius: 20, padding: "2px 9px" }}>
+              {proposedTotal} members
+            </span>
+            <span style={{ fontSize: 9, fontWeight: 700, color: "#D97706", background: "#FEF3C7", border: "1px solid #FCD34D", borderRadius: 20, padding: "2px 8px", marginLeft: 2 }}>
+              Draft
+            </span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {PROPOSED_LEADS.map((lead) => <TeamCard key={lead.name} lead={lead} isProposed />)}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}

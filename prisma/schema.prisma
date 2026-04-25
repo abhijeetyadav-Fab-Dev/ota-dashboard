@@ -1,0 +1,208 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Property {
+  id         String       @id
+  name       String
+  city       String?
+  fhLiveDate String? // stored as ISO string "YYYY-MM-DD"
+  fhStatus   String?
+  syncedAt   String // ISO timestamp
+  bdcId      String?      @map("bdc_id")
+  geniusStatus String?    @map("genius_status")
+  geniusLastChecked String? @map("genius_last_checked")
+
+  otaListings OtaListing[]
+
+  @@map("property")
+}
+
+model OtaListing {
+  id         Int      @id @default(autoincrement())
+  propertyId String
+  ota        String
+  status     String?
+  subStatus  String?
+  liveDate   String? // stored as ISO string "YYYY-MM-DD"
+  otaId      String?
+  syncedAt   String // ISO timestamp
+  tat        Int     @default(0)
+  tatError   Int     @default(0)
+  fhLiveDate String?
+  assignedTo String?
+  updatedBy  String?
+  crmNote    String?
+  crmUpdatedAt String?
+  prePost    String?
+  listingLink String?
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([propertyId, ota])
+  @@index([ota])
+  @@index([subStatus])
+  @@index([propertyId])
+  @@index([status])
+  @@map("ota_listing")
+}
+
+model RnsDaily {
+  id       Int    @id @default(autoincrement())
+  date     String
+  channel  String
+  ota      String
+  rns      Int    @default(0)
+  syncedAt String
+
+  @@unique([date, channel])
+  @@index([date])
+  @@index([ota])
+  @@map("rns_daily")
+}
+
+model RnsStay {
+  id           Int     @id @default(autoincrement())
+  stayDate     String  @map("stay_date")
+  ota          String
+  guestStatus  String? @map("guest_status")
+  rns          Int     @default(0)
+  revenue      Float   @default(0)
+  syncedAt     String
+
+  @@unique([stayDate, ota, guestStatus])
+  @@index([stayDate])
+  @@index([ota])
+  @@map("rns_stay")
+}
+
+model RnsSold {
+  id        Int     @id @default(autoincrement())
+  soldDate  String  @map("sold_date")
+  ota       String
+  rns       Int     @default(0)
+  revenue   Float   @default(0)
+  syncedAt  String
+
+  @@unique([soldDate, ota])
+  @@index([soldDate])
+  @@index([ota])
+  @@map("rns_sold")
+}
+
+model GeniusData {
+  id            Int     @id @default(autoincrement())
+  propId        String? @map("prop_id")
+  bdcId         String  @map("bdc_id")
+  propName      String? @map("prop_name")
+  city          String?
+  fhStatus      String? @map("fh_status")
+  bdcStatus     String? @map("bdc_status")
+  geniusStatus  String? @map("genius_status")
+  lastChecked   String? @map("last_checked")
+  remark        String?
+  syncedAt      String
+
+  @@index([bdcId])
+  @@index([geniusStatus])
+  @@index([syncedAt])
+  @@map("genius_data")
+}
+
+model HygieneData {
+  id             Int     @id @default(autoincrement())
+  propId         String? @map("prop_id")
+  bdcId          String  @map("bdc_id")
+  propName       String? @map("prop_name")
+  city           String?
+  reviewScore    String? @map("review_score")
+  reviewCount    String? @map("review_count")
+  preferred      String?
+  geniusLevel    String? @map("genius_level")
+  perfScore     String? @map("perf_score")
+  topPromotion  String? @map("top_promotion")
+  commissionPct  String? @map("commission_pct")
+  views          String?
+  conversionPct  String? @map("conversion_pct")
+  pageScore      String? @map("page_score")
+  lastChecked    String? @map("last_checked")
+  syncedAt       String
+
+  @@index([bdcId])
+  @@index([syncedAt])
+  @@map("hygiene_data")
+}
+
+model GmbTracker {
+  id               Int     @id @default(autoincrement())
+  propertyId       String  @unique
+  propertyName     String?
+  city             String?
+  createdAt        String?
+  fhStatus         String?
+  prePost          String?
+  gmbStatus        String?
+  gmbSubStatus     String?
+  listingType      String?
+  number           String?
+  reviewLinkTracker String?
+  gmbRating        String?
+  gmbReviewCount   String?
+  syncedAt         String
+
+  @@index([gmbStatus])
+  @@index([fhStatus])
+  @@map("gmb_tracker")
+}
+
+model Users {
+  id           String   @id
+  username     String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("intern")
+  ota          String?
+  teamLead     String?
+  active       Boolean  @default(true)
+  createdAt    String
+
+  @@map("users")
+}
+
+model PropertyLog {
+  id           Int      @id @default(autoincrement())
+  propertyId   String
+  otaListingId Int?
+  userId       String
+  action       String
+  field        String?
+  oldValue     String?
+  newValue     String?
+  note         String?
+  createdAt    String
+
+  @@index([propertyId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("property_log")
+}
+
+model OtaMetrics {
+  id          Int     @id @default(autoincrement())
+  propertyId  String
+  ota         String
+  metricKey   String
+  metricValue String?
+  updatedBy   String?
+  updatedAt   String
+
+  @@unique([propertyId, ota, metricKey])
+  @@index([propertyId, ota])
+  @@map("ota_metrics")
+}

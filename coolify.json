@@ -1,0 +1,63 @@
+{
+  "name": "ota-dashboard",
+  "description": "OTA Dashboard - Next.js app with PostgreSQL",
+  "version": "1.0.0",
+  "id": null,
+  "domains": [],
+  "git": {
+    "repository": "",
+    "branch": "main"
+  },
+  "build": {
+    "dockerfile": "Dockerfile",
+    "workdir": "/"
+  },
+  "ports": [
+    {
+      "host": 3000,
+      "container": 3000
+    }
+  ],
+  "environment": [
+    {
+      "key": "DATABASE_URL",
+      "value": "",
+      "is_secret": true
+    },
+    {
+      "key": "SESSION_SECRET",
+      "value": "",
+      "is_secret": true
+    },
+    {
+      "key": "NODE_ENV",
+      "value": "production"
+    }
+  ],
+  "resources": {
+    "memory": 512,
+    "cpu": 1
+  },
+  "databases": [
+    {
+      "id": null,
+      "name": "postgres",
+      "display_name": "PostgreSQL",
+      "type": "postgresql",
+      "version": "15",
+      "is_public": false
+    }
+  ],
+  "commands": [
+    {
+      "name": "prisma-migrate",
+      "command": "npx prisma migrate deploy",
+      "execute_on": "deployment"
+    },
+    {
+      "name": "prisma-generate",
+      "command": "npx prisma generate",
+      "execute_on": "deployment"
+    }
+  ]
+}
