@@ -5,7 +5,7 @@
   "id": null,
   "domains": [],
   "git": {
-    "repository": "",
+    "repository": "https://github.com/abhijeetyadav-Fab-Dev/ota-dashboard.git",
     "branch": "main"
   },
   "build": {
